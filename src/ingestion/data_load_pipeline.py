@@ -9,9 +9,7 @@ def load_data(file):
         return pd.read_csv(file)
     
     elif filename.endswith(".json"):
-        # Streamlit file uploader gives a BytesIO-like object → need decode
         data = json.load(file)
         return pd.DataFrame(data)
-    
     else:
         raise ValueError("Unsupported file format. Please upload CSV or JSON.")

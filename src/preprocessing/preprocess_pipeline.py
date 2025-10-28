@@ -29,40 +29,46 @@ def convert_numeric_columns(df: pd.DataFrame, columns=None) -> pd.DataFrame:
             df[col] = pd.to_numeric(df[col], errors='coerce')
     return df
 
+
 def fill_missing_values(df: pd.DataFrame, method='ffill') -> pd.DataFrame:
     df = df.copy()
     numeric_cols = df.select_dtypes(include='number').columns
+
     if method == 'ffill':
-        df[numeric_cols] = df[numeric_cols].fillna(method='ffill')
+        df[numeric_cols] = df[numeric_cols].ffill()
     elif method == 'bfill':
-        df[numeric_cols] = df[numeric_cols].fillna(method='bfill')
+        df[numeric_cols] = df[numeric_cols].bfill()
     else:
         df[numeric_cols] = df[numeric_cols].fillna(df[numeric_cols].mean())
+
     return df
 
-def resample_data(df: pd.DataFrame, timestamp_col='timestamp', freq='1T') -> pd.DataFrame:
+
+def resample_data(df: pd.DataFrame, timestamp_col='timestamp', freq='1min') -> pd.DataFrame:
+    """
+    Resample numeric data based on timestamp column.
+    Default freq='1min' (not deprecated 'T').
+    """
     df = clean_timestamps(df, timestamp_col)
     df = df.set_index(timestamp_col)
+
     numeric_cols = df.select_dtypes(include='number')
     resampled = numeric_cols.resample(freq).mean().ffill()
     return resampled
 
-def preprocess_pipeline(file_path: str, timestamp_col='timestamp', freq='1T') -> pd.DataFrame:
+
+def preprocess_pipeline(file_path: str, timestamp_col='timestamp', freq='1min') -> pd.DataFrame:
     path = Path(file_path)
     df = pd.read_csv(path) if path.suffix == '.csv' else pd.read_json(path)
 
-    
     df = convert_numeric_columns(df)
-
-   
     df = clean_timestamps(df, timestamp_col)
-
-    
     df = fill_missing_values(df)
-
-   
     df = resample_data(df, timestamp_col, freq)
+
+    df = df.replace([float('inf'), float('-inf')], pd.NA).dropna(how='all', axis=1)
     return df
+
 
 if __name__ == '__main__':
     sample_path = '../../data/sample_heart_rate.csv'

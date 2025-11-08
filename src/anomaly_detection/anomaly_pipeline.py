@@ -28,52 +28,11 @@ class AnomalyDetector:
         df['anomaly_model'] = ((df[residual_col] > upper) | (df[residual_col] < lower)).astype(int)
         return df
 
-    # def cluster_based(self, feature_df: pd.DataFrame, method='kmeans', eps=0.5, n_clusters=3):
-    #     """
-    #     Cluster similar behavior patterns using KMeans or DBSCAN.
-    #     """
-    #     if method == 'kmeans':
-    #         model = KMeans(n_clusters=n_clusters, random_state=42)
-    #     else:
-    #         model = DBSCAN(eps=eps, min_samples=5)
-        
-    #     labels = model.fit_predict(feature_df)
-    #     feature_df['cluster'] = labels
-    #     return feature_df, model
-    # def cluster_based(self, feature_df: pd.DataFrame, method='kmeans', eps=0.5, n_clusters=3):
-    #     """
-    #     Cluster similar behavior patterns using KMeans or DBSCAN and flag anomalies.
-    #     """
-    #     if method == 'kmeans':
-    #         model = KMeans(n_clusters=n_clusters, random_state=42)
-    #         labels = model.fit_predict(feature_df)
-    #         feature_df['cluster'] = labels
-
-    #         # Compute distances to cluster centers
-    #         _, distances = pairwise_distances_argmin_min(feature_df, model.cluster_centers_)
-    #         threshold = distances.mean() + 2 * distances.std()  # mark far points as anomalies
-    #         feature_df['anomaly_cluster'] = (distances > threshold).astype(int)
-
-    #     elif method == 'dbscan':
-    #         model = DBSCAN(eps=eps, min_samples=5)
-    #         labels = model.fit_predict(feature_df)
-    #         feature_df['cluster'] = labels
-    #         # DBSCAN labels -1 as noise (anomalies)
-    #         feature_df['anomaly_cluster'] = (labels == -1).astype(int)
-
-    #     else:
-    #         raise ValueError("method must be 'kmeans' or 'dbscan'")
-
-    #     return feature_df, model
-    
-    
-    
     def cluster_based(self, feature_df: pd.DataFrame, method='kmeans', eps=0.5, n_clusters=3):
         """
         Cluster similar behavior patterns using KMeans or DBSCAN and flag anomalies.
         Works only with numeric features. Non-numeric columns are ignored.
         """
-        # Keep only numeric features
         numeric_features = feature_df.select_dtypes(include=np.number).copy()
     
         if numeric_features.empty:
@@ -84,11 +43,9 @@ class AnomalyDetector:
             labels = model.fit_predict(numeric_features)
             feature_df['cluster'] = labels
 
-            # Compute distances to cluster centers
             from sklearn.metrics import pairwise_distances_argmin_min
             _, distances = pairwise_distances_argmin_min(numeric_features, model.cluster_centers_)
         
-            # Mark points far from cluster center as anomalies
             threshold = distances.mean() + 2 * distances.std()
             feature_df['anomaly_cluster'] = (distances > threshold).astype(int)
 

@@ -17,7 +17,7 @@ from src.preprocessing.preprocess_pipeline import preprocess_pipeline
 from src.featuring.feature_extraction import extract_tsfresh_features
 from src.modeling.prophet_model import fit_prophet_model
 from src.modeling.clustering_model import kmeans_cluster,dbscan_cluster
-from src.visualization.visualize import plot_metric, plot_residuals, plot_clusters
+from src.visualization.visualize import plot_clusters,plot_metric,plot_model_anomalies,plot_residuals,plot_rule_anomalies
 from anomaly_detection.anomaly_pipeline import AnomalyDetector
 
 
@@ -27,10 +27,9 @@ st.set_page_config(
     layout="wide",
     initial_sidebar_state="expanded"
 )
-# --- 🌐 PROFESSIONAL MINIMAL UI STYLING ---
+
 st.markdown("""
 <style>
-/* 🌍 GLOBAL LAYOUT */
 [data-testid="stAppViewContainer"] {
     background-color: #f8fafc;
     font-family: 'Inter', 'Segoe UI', Roboto, sans-serif;
@@ -47,7 +46,6 @@ h1, h2, h3 {
     font-weight: 700;
 }
 
-/* 📊 MAIN CONTENT CONTAINER */
 .block-container {
     padding: 2rem 2.5rem;
 }
@@ -76,7 +74,6 @@ h1, h2, h3 {
     box-shadow: 0 4px 10px rgba(0,115,230,0.25);
 }
 
-/* 🧭 SIDEBAR PANEL */
 [data-testid="stSidebar"] {
     background: #ffffff;
     border-right: 1px solid #e2e8f0;
@@ -97,7 +94,6 @@ h1, h2, h3 {
     font-size: 14px;
 }
 
-/* 📂 FILE UPLOADER */
 .stFileUploader {
     background-color: #f9fafb;
     border: 1px dashed #cbd5e1;
@@ -129,7 +125,6 @@ h1, h2, h3 {
     transform: translateY(-2px);
 }
 
-/* 🎛️ WIDGETS (Selectbox, Slider, Radio, Input) */
 .stSelectbox, .stSlider, .stRadio, .stTextInput {
     background: #f9fafb !important;
     border-radius: 10px;
@@ -143,7 +138,6 @@ h1, h2, h3 {
     box-shadow: 0 2px 8px rgba(0,115,230,0.15);
 }
 
-/* ⚡ BUTTONS */
 .stButton>button, .stDownloadButton>button {
     background: linear-gradient(90deg, #0073e6, #0096c7);
     color: white !important;
@@ -160,7 +154,6 @@ h1, h2, h3 {
     box-shadow: 0 6px 14px rgba(0,0,0,0.2);
 }
 
-/* 📈 METRIC CARDS */
 [data-testid="stMetric"] {
     background: #ffffff;
     border-radius: 12px;
@@ -173,7 +166,6 @@ h1, h2, h3 {
     box-shadow: 0 6px 18px rgba(0,0,0,0.1);
 }
 
-/* 🧩 ANOMALY CARDS */
 .card {
     background: #ffffff;
     border-radius: 12px;
@@ -190,18 +182,15 @@ h1, h2, h3 {
 .anomaly-model { background-color: #ecfdf5; color: #047857; }
 .anomaly-cluster { background-color: #f5f3ff; color: #6d28d9; }
 
-/* 🪟 DATAFRAME */
 [data-testid="stDataFrame"] {
     border-radius: 10px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
-/* 📜 SCROLLBAR */
 ::-webkit-scrollbar { width: 10px; }
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 5px; }
 ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 
-/* 📱 RESPONSIVE DESIGN */
 @media (max-width: 768px) {
     [data-testid="stSidebar"] { padding: 15px; }
     .stButton>button { width: 100%; }
@@ -217,7 +206,6 @@ metric_selection = None
 raw_df, processed = None, None
 st.markdown("""
 <style>
-/* --- SIDEBAR CONTAINER --- */
 [data-testid="stSidebar"] {
     background: linear-gradient(180deg, #0f2027, #203a43, #2c5364);
     color: #e3f2fd;
@@ -226,7 +214,6 @@ st.markdown("""
     box-shadow: 4px 0 10px rgba(0,0,0,0.3);
 }
 
-/* --- TITLES --- */
 [data-testid="stSidebar"] h2, 
 [data-testid="stSidebar"] h3 {
     color: #90caf9;
@@ -239,14 +226,12 @@ st.markdown("""
     padding-bottom: 6px;
 }
 
-/* --- TEXT ELEMENTS --- */
 [data-testid="stSidebar"] p, 
 [data-testid="stSidebar"] span {
     color: #cfd8dc;
     font-size: 14px;
 }
 
-/* --- FILE UPLOADER --- */
 .stFileUploader {
     background-color: rgba(255,255,255,0.1);
     border: 1px solid rgba(255,255,255,0.2);
@@ -259,7 +244,6 @@ st.markdown("""
     transform: translateY(-3px);
 }
 
-/* --- FILE UPLOADER BUTTON --- */
 .stFileUploader button {
     background: linear-gradient(90deg, #1e88e5, #42a5f5);
     color: white;
@@ -274,7 +258,6 @@ st.markdown("""
     transform: translateY(-2px);
 }
 
-/* --- SIDEBAR BUTTONS --- */
 div.stButton > button {
     width: 100%;
     border-radius: 10px;
@@ -291,7 +274,6 @@ div.stButton > button:hover {
     box-shadow: 0 4px 12px rgba(33,150,243,0.3);
 }
 
-/* --- SCROLLBAR --- */
 [data-testid="stSidebar"]::-webkit-scrollbar {
     width: 8px;
 }
@@ -311,14 +293,12 @@ if uploaded_file:
     st.sidebar.success("✅ File loaded successfully!")
     raw_df = df.copy()  
 
-    # Preprocessing
     with tempfile.NamedTemporaryFile(delete=False, suffix=".csv") as tmp:
         tmp.write(uploaded_file.getbuffer())
         tmp_path = tmp.name
     processed = preprocess_pipeline(tmp_path)
     os.remove(tmp_path)
 
-    # Columns for numeric selection
     date_cols = [c for c in processed.columns if 'time' in c.lower() or 'date' in c.lower()]
     numeric_cols = [c for c in processed.select_dtypes(include=np.number).columns if c not in date_cols]
 
@@ -328,28 +308,23 @@ if uploaded_file:
         )
     else:
         st.sidebar.error("No numeric columns available for selection.")
-    # Anomaly Summary 
     if "heart_rate" in df.columns:
         df["heart_rate"] = pd.to_numeric(df["heart_rate"], errors="coerce")
         rule_based_count = int((df["heart_rate"] > 100).sum())
     else:
         rule_based_count = 0
 
-# Tabs
-tabs = st.tabs(["Raw Data", "Preprocessing", "Forecasting", "Anomalies", "Clustering"])
+tabs = st.tabs(["Raw Data", "Preprocessing", "Forecasting", "Anomalies", "Clustering", "Export Reports"])
 
 if uploaded_file and metric_selection:
-    # Tab 1: Raw Data 
     with tabs[0]:
         st.subheader("📊 Raw Data Preview")
         st.dataframe(raw_df.head() if raw_df is not None else "Upload a file to preview raw data.")
 
-    # Tab 2: Processed Data 
     with tabs[1]:
         st.subheader("🧹 Processed Data")
         st.dataframe(processed.head() if processed is not None else "Upload a file to see processed data.")
 
-    # Tab 3: Forecasting
     with tabs[2]:
         st.subheader("📉 Advanced Forecasting Visualization")
         series = processed[metric_selection]
@@ -369,7 +344,6 @@ if uploaded_file and metric_selection:
         )
         forecast_df = forecast_df.reset_index(drop=True)
 
-        # Plot Actual vs Forecast
         fig = go.Figure()
         fig.add_trace(go.Scatter(x=df_prophet['ds'], y=df_prophet['y'],
                                  mode='lines+markers', name='Actual',
@@ -403,7 +377,6 @@ if uploaded_file and metric_selection:
                           legend=dict(orientation="h", y=-0.2), height=600)
         st.plotly_chart(fig, use_container_width=True)
 
-        # Rolling Trend
         st.markdown("Rolling Trend Comparison")
         df_trend = df_prophet.copy()
         df_trend["Short_MA"] = df_trend["y"].rolling(window=5).mean()
@@ -415,7 +388,6 @@ if uploaded_file and metric_selection:
         fig_trend.update_layout(template="plotly_white", title="Short vs Long-Term Trend", height=500)
         st.plotly_chart(fig_trend, use_container_width=True)
 
-        # Forecast Error Distribution
         st.markdown("Forecast Error Distribution")
         if 'residual' in forecast_df.columns:
             fig_resid = px.histogram(forecast_df['residual'], nbins=30, marginal="box",
@@ -423,7 +395,6 @@ if uploaded_file and metric_selection:
                                      color_discrete_sequence=['#c1272d'])
             st.plotly_chart(fig_resid, use_container_width=True)
 
-        # Summary Metrics
         st.markdown("### 📊 Summary Metrics")
         col1, col2, col3, col4 = st.columns(4)
         min_val, mean_val, max_val = series.min(), series.mean(), series.max()
@@ -434,7 +405,6 @@ if uploaded_file and metric_selection:
         col3.metric("Max", f"{max_val:.2f}")
         col4.metric("Trend", trend_direction)
 
-    # Tab 4: Anomalies
     with tabs[3]:
         st.subheader("⚠️ Health Anomaly Detection")
 
@@ -443,7 +413,6 @@ if uploaded_file and metric_selection:
         
         method = st.radio("Select Detection Method", ["Rule-based", "Model-based", "Cluster-based"], horizontal=True)
 
-        # --------------------- Rule-based ---------------------
         if method == "Rule-based":
             low_thr = st.slider("Low Threshold", 40, 100, 50)
             high_thr = st.slider("High Threshold", 100, 200, 120)
@@ -483,8 +452,8 @@ if uploaded_file and metric_selection:
                 legend=dict(orientation="h", y=-0.2)
             )
             st.plotly_chart(fig_rule, use_container_width=True)
-
-            # Solid color card
+            
+            
             st.markdown(f"""
             <div style="background-color:#ffccbc;
                         padding: 20px;
@@ -493,11 +462,8 @@ if uploaded_file and metric_selection:
                         box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-top:10px;">
                 <h4 style="color:#d84315; margin:0;">🚨 Rule-based Anomalies Detected</h4>
                 <h1 style="color:#d84315; margin:5px 0;">{int(df_anom['anomaly_rule'].sum())}</h1>
-                <p style="color:#555; margin:0;">Out of {len(df_anom)} readings</p>
             </div>
             """, unsafe_allow_html=True)
-
-        # --------------------- Model-based ---------------------
         if method == "Model-based":
             if "residual" not in forecast_df.columns:
                 st.warning("Residuals missing — run forecasting first.")
@@ -539,8 +505,11 @@ if uploaded_file and metric_selection:
                     legend=dict(orientation="h", y=-0.2)
                 )
                 st.plotly_chart(fig_mod, use_container_width=True)
-
-                # Solid color card
+ 
+                
+                valid_records = len(raw_df) if raw_df is not None else len(df_anom)
+                anomaly_count = int(df_anom['anomaly_model'].sum())
+                
                 st.markdown(f"""
                 <div style="background-color:#b2dfdb;
                             padding: 20px;
@@ -552,7 +521,8 @@ if uploaded_file and metric_selection:
                     <p style="color:#555; margin:0;">Detected via residual deviation</p>
                 </div>
                 """, unsafe_allow_html=True)
-        # --------------------- Cluster-based ---------------------
+
+                
         if method == "Cluster-based":
             numeric_cols = df_anom.select_dtypes(include=np.number).columns.tolist()
             if len(numeric_cols) < 2:
@@ -565,7 +535,7 @@ if uploaded_file and metric_selection:
                 reduced = pca.fit_transform(df_anom[numeric_cols])
                 df_vis = pd.DataFrame(reduced, columns=["PC1", "PC2"])
                 df_vis["Cluster"] = df_anom["cluster"].astype(str)
-                df_vis["Anomaly"] = df_anom["anomaly_cluster"].astype(bool)
+                df_vis["Anomaly"] = df_anom["cluster"].astype(bool)
 
                 fig_cluster = px.scatter(
                     df_vis, x="PC1", y="PC2",
@@ -579,7 +549,6 @@ if uploaded_file and metric_selection:
                 fig_cluster.update_traces(marker=dict(size=12, opacity=0.9, line=dict(width=1, color='white')))
                 fig_cluster.update_layout(template="plotly_dark", height=500)
                 st.plotly_chart(fig_cluster, use_container_width=True)
-                # Solid color card
                 st.markdown(f"""
                 <div style="background-color:#e1bee7;
                             padding: 20px;
@@ -587,12 +556,17 @@ if uploaded_file and metric_selection:
                             text-align: center;
                             box-shadow: 0 4px 12px rgba(0,0,0,0.15); margin-top:10px;">
                     <h4 style="color:#6a1b9a; margin:0;">🟣 Cluster-based Anomalies Detected</h4>
-                    <h1 style="color:#6a1b9a; margin:5px 0;">{int(df_anom['anomaly_cluster'].sum())}</h1>
+                    <h1 style="color:#6a1b9a; margin:5px 0;">{int(df_anom['cluster'].sum())}</h1>
                     <p style="color:#555; margin:0;">Highlighted via {cluster_method}</p>
                 </div>
-                """, unsafe_allow_html=True)
-
-    # Tab 5: Clustering
+                """, unsafe_allow_html=True)  
+        if method == "Rule-based":
+            anomaly_df = df_anom[df_anom["anomaly_rule"] == True].copy()
+        elif method == "Model-based":
+            anomaly_df = df_anom[df_anom["anomaly_model"] == True].copy()
+        elif method == "Cluster-based":
+            anomaly_df = df_anom[df_anom["cluster"] == True].copy()
+            
     with tabs[4]:
         st.subheader("Clustering Analysis")
         series = processed[metric_selection].copy().reset_index(drop=True)
@@ -670,12 +644,54 @@ if uploaded_file and metric_selection:
             output_df = features.copy()
             output_df["KMeans_Cluster"] = klabels
             output_df["DBSCAN_Cluster"] = dlabels
-            st.download_button(
-                "⬇️ Download Clustered Data",
-                output_df.to_csv(index=False).encode("utf-8"),
-                "clustered_output.csv",
-                "text/csv"
-            )
 
         except Exception as e:
             st.error(f"⚠️ Clustering failed: {e}")  
+    
+    from reportlab.lib.pagesizes import letter
+    from reportlab.pdfgen import canvas
+    from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph
+    from reportlab.lib import colors
+    from reportlab.lib.styles import getSampleStyleSheet
+    import io
+
+    with tabs[5]:
+        st.subheader("📄 Export Reports")
+
+        if uploaded_file and processed is not None and anomaly_df is not None:
+            csv_file = anomaly_df.to_csv(index=False).encode('utf-8')
+            st.download_button(
+            label="⬇️ Download Anomaly CSV",
+            data=csv_file,
+            file_name="anomaly_report.csv",
+            mime="text/csv"
+            )
+            buffer = io.BytesIO()
+            doc = SimpleDocTemplate(buffer, pagesize=letter)
+            styles = getSampleStyleSheet()
+
+            title = Paragraph("FitPulse - Detailed Anomaly Report", styles['Title'])
+            table_data = [anomaly_df.columns.to_list()] + anomaly_df.values.tolist()
+
+            table = Table(table_data)
+            table.setStyle(TableStyle([
+                ('BACKGROUND', (0,0), (-1,0), colors.lightblue),
+                ('TEXTCOLOR', (0,0), (-1,0), colors.black),
+                ('ALIGN', (0,0), (-1,-1), 'CENTER'),
+                ('FONTNAME', (0,0), (-1,0), 'Helvetica-Bold'),
+                ('BOTTOMPADDING', (0,0), (-1,0), 8),
+                ('GRID', (0,0), (-1,-1), 0.5, colors.gray)
+            ]))
+
+            doc.build([title, table])
+
+            st.download_button(
+            label="📄 Download Anomaly PDF Report",
+            data=buffer.getvalue(),
+            file_name="anomaly_report.pdf",
+            mime="application/pdf"
+            )
+
+        else:
+            st.warning("Upload and process data to enable export.")
+

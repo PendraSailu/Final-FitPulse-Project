@@ -83,8 +83,10 @@ All results are displayed in a user-friendly Streamlit dashboard where users can
 
 ### 60-Day Forecast Visualization
 <img width="2398" height="1233" alt="image" src="https://github.com/user-attachments/assets/88b58710-987e-4f84-a486-93967c1db3fe" />
+
 ### Forecast Residuals and Summary Metrics
 <img width="2398" height="1235" alt="image" src="https://github.com/user-attachments/assets/62ff17bb-46f0-4f14-9a68-c5756d3d9694" />
+
 ### Cluster Distribution and Silhouette Score
 <img width="2400" height="1199" alt="image" src="https://github.com/user-attachments/assets/6b4d1d89-9fa8-40fd-bbe5-35606f4174c1" />
 
@@ -94,12 +96,14 @@ All results are displayed in a user-friendly Streamlit dashboard where users can
 - **Cluster-based**: Outliers from cluster groupings
 ### Rule-Based Anomaly Detection
 <img width="1306" height="1229" alt="image" src="https://github.com/user-attachments/assets/051e940f-6dcf-4a25-870c-d0ce4cd7143e" />
+
 ### Model-Based Anomaly Detection
   <img width="1255" height="1224" alt="image" src="https://github.com/user-attachments/assets/c3f492cc-ad64-48f8-9f9e-46d493a9eaf9" />
+  
 ### Cluster-Based Anomaly Detection (K-Means Method)
   <img width="1165" height="1248" alt="image" src="https://github.com/user-attachments/assets/0ae4e7ac-7f32-4070-9b47-47de9ba860af" />
 
-### **Milestone 4 – Dashboard & Visualization**
+## **Milestone 4 – Dashboard & Visualization**
 - User uploads data and runs detection process
 - Interactive plots show trends and anomalies
 - Results exportable in **CSV or PDF**

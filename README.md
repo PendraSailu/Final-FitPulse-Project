@@ -1,4 +1,4 @@
-<img width="420" height="88" alt="image" src="https://github.com/user-attachments/assets/41bcb701-2084-4ce9-8576-9882a996143e" /># FitPulse – Health Anomaly Detection from Wearable Fitness Data
+### FitPulse – Health Anomaly Detection from Wearable Fitness Data
 
 FitPulse is a system that analyzes time-series data from wearable fitness devices (such as heart rate, steps, and sleep patterns) to detect unusual health behavior. The system preprocesses raw fitness data, extracts meaningful features, forecasts trends, detects anomalies, and visualizes insights through an interactive Streamlit dashboard.
 
@@ -71,9 +71,9 @@ All results are displayed in a user-friendly Streamlit dashboard where users can
 - Aligns timestamps and normalizes values
 
 # Program Outputs: 
-- Raw Data Preview
+# Raw Data Preview
 <img width="2400" height="1185" alt="image" src="https://github.com/user-attachments/assets/265ba2eb-2c31-4094-86c9-dad8fa56abf6" />
-- Processed Data View
+# Processed Data View
 <img width="2400" height="1222" alt="image" src="https://github.com/user-attachments/assets/2454cceb-9412-4ce0-897d-53bce8a14517" />
 
 ### **Milestone 2 – Feature Extraction & Modeling**
@@ -81,7 +81,7 @@ All results are displayed in a user-friendly Streamlit dashboard where users can
 - Uses **Prophet** to model time-series patterns
 - Uses **KMeans** and **DBSCAN** to group similar behaviors
 
-- 60-Day Forecast Visualization
+# 60-Day Forecast Visualization
 <img width="2398" height="1233" alt="image" src="https://github.com/user-attachments/assets/88b58710-987e-4f84-a486-93967c1db3fe" />
 - Forecast Residuals and Summary Metrics
 <img width="2398" height="1235" alt="image" src="https://github.com/user-attachments/assets/62ff17bb-46f0-4f14-9a68-c5756d3d9694" />
@@ -92,18 +92,18 @@ All results are displayed in a user-friendly Streamlit dashboard where users can
 - **Rule-based**: Based on threshold limits
 - **Model-based**: Forecast vs actual deviation
 - **Cluster-based**: Outliers from cluster groupings
-- Rule-Based Anomaly Detection
+# Rule-Based Anomaly Detection
 <img width="1306" height="1229" alt="image" src="https://github.com/user-attachments/assets/051e940f-6dcf-4a25-870c-d0ce4cd7143e" />
-- Model-Based Anomaly Detection
+# Model-Based Anomaly Detection
   <img width="1255" height="1224" alt="image" src="https://github.com/user-attachments/assets/c3f492cc-ad64-48f8-9f9e-46d493a9eaf9" />
-- Cluster-Based Anomaly Detection (K-Means Method)
+# Cluster-Based Anomaly Detection (K-Means Method)
   <img width="1165" height="1248" alt="image" src="https://github.com/user-attachments/assets/0ae4e7ac-7f32-4070-9b47-47de9ba860af" />
 
 ### **Milestone 4 – Dashboard & Visualization**
 - User uploads data and runs detection process
 - Interactive plots show trends and anomalies
 - Results exportable in **CSV or PDF**
-- Export Reports
+# Export Reports
 
 <img width="2400" height="1227" alt="image" src="https://github.com/user-attachments/assets/d0c4c6f0-da94-47ba-a534-650561c8ac5c" />
 

@@ -43,8 +43,7 @@ All results are displayed in a user-friendly Streamlit dashboard where users can
 
 ## 📂 Project Structure
 
-
-<img width="251" height="520" alt="image" src="https://github.com/user-attachments/assets/970d4209-9ef1-42b4-9e83-74ee9cafe9f9" />
+<img width="253" height="453" alt="image" src="https://github.com/user-attachments/assets/570bd2db-399e-49fa-bfcd-7b64fd3107a1" />
 
 ---
 
@@ -71,8 +70,10 @@ All results are displayed in a user-friendly Streamlit dashboard where users can
 - Aligns timestamps and normalizes values
 
 ## Program Outputs: 
+
 ### Raw Data Preview
 <img width="2400" height="1185" alt="image" src="https://github.com/user-attachments/assets/265ba2eb-2c31-4094-86c9-dad8fa56abf6" />
+
 ### Processed Data View
 <img width="2400" height="1222" alt="image" src="https://github.com/user-attachments/assets/2454cceb-9412-4ce0-897d-53bce8a14517" />
 

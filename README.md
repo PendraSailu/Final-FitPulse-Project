@@ -64,7 +64,7 @@ All results are displayed in a user-friendly Streamlit dashboard where users can
 
 ## 🧪 Milestones
 
-## **Milestone 1 – Data Collection & Preprocessing**
+## **Data Collection & Preprocessing**
 - Accepts CSV/JSON input
 - Removes duplicates and fills missing data
 - Aligns timestamps and normalizes values
@@ -77,7 +77,7 @@ All results are displayed in a user-friendly Streamlit dashboard where users can
 ### Processed Data View
 <img width="2400" height="1222" alt="image" src="https://github.com/user-attachments/assets/2454cceb-9412-4ce0-897d-53bce8a14517" />
 
-## **Milestone 2 – Feature Extraction & Modeling**
+## **Feature Extraction & Modeling**
 - Uses **TSFresh** to extract statistical trends
 - Uses **Prophet** to model time-series patterns
 - Uses **KMeans** and **DBSCAN** to group similar behaviors
@@ -91,7 +91,7 @@ All results are displayed in a user-friendly Streamlit dashboard where users can
 ### Cluster Distribution and Silhouette Score
 <img width="2400" height="1199" alt="image" src="https://github.com/user-attachments/assets/6b4d1d89-9fa8-40fd-bbe5-35606f4174c1" />
 
-## **Milestone 3 – Anomaly Detection**
+## **Anomaly Detection**
 - **Rule-based**: Based on threshold limits
 - **Model-based**: Forecast vs actual deviation
 - **Cluster-based**: Outliers from cluster groupings
@@ -104,7 +104,7 @@ All results are displayed in a user-friendly Streamlit dashboard where users can
 ### Cluster-Based Anomaly Detection (K-Means Method)
   <img width="1165" height="1248" alt="image" src="https://github.com/user-attachments/assets/0ae4e7ac-7f32-4070-9b47-47de9ba860af" />
 
-## **Milestone 4 – Dashboard & Visualization**
+## **Dashboard & Visualization**
 - User uploads data and runs detection process
 - Interactive plots show trends and anomalies
 - Results exportable in **CSV or PDF**
@@ -118,6 +118,4 @@ All results are displayed in a user-friendly Streamlit dashboard where users can
 pip install -r requirements.txt
 streamlit run app.py
 
-
-## 🧱 System Workflow
 
